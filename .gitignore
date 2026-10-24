@@ -1,0 +1,95 @@
+# ==========================================
+# DataAgent AI — Comprehensive .gitignore
+# ==========================================
+
+# Secrets & Environment Variables (Never commit to VCS)
+.env
+.env.local
+.env.*.local
+*.env
+.env.example
+frontend/.env
+frontend/.env.local
+backend/.env
+backend/.env.local
+
+# User Requested Exclusions (Brain & Test directories)
+brain/
+/brain
+brain
+tests/
+backend/tests/
+/backend/tests
+test_*.json
+test_*.py
+*test_backend*
+test_gemini.json
+
+# Node & Frontend Build Artifacts
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+.vite/
+frontend/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python & Backend Artifacts
+__pycache__/
+backend/**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+.venv/
+backend/.venv/
+env/
+ENV/
+
+# Pytest & Testing Cache
+.pytest_cache/
+backend/.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Local Storage, Uploads & Reports Cache
+storage/
+backend/storage/
+*.log
+
+# IDE & Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+.antigravity/
+.gemini/
+
+# OS Specific Junk
+.DS_Store
+Thumbs.db
+desktop.ini
+*.blf
+*.regtrans-ms
+*.lnk
