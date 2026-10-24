@@ -509,12 +509,12 @@ export const HomePage: React.FC = () => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#DAD3C6]">
                   <span className="text-[11px] text-[#5B5245] font-semibold">Total Revenue</span>
-                  <div className="text-2xl font-bold text-[#133857] mt-1">$84,113</div>
+                  <div className="text-2xl font-bold text-[#133857] mt-1">₹71,49,677</div>
                   <span className="text-[10px] text-[#6F804F] font-semibold">↑ 18% vs avg</span>
                 </div>
                 <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#DAD3C6]">
                   <span className="text-[11px] text-[#5B5245] font-semibold">Total Profit</span>
-                  <div className="text-2xl font-bold text-[#133857] mt-1">$24,957</div>
+                  <div className="text-2xl font-bold text-[#133857] mt-1">₹21,21,426</div>
                   <span className="text-[10px] text-[#226192] font-semibold">29.7% margin</span>
                 </div>
                 <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#DAD3C6]">
@@ -554,10 +554,10 @@ export const HomePage: React.FC = () => {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2">
                 {[
-                  { name: "Furniture", val: "$41,552", pct: "49.4%", color: "bg-[#226192]" },
-                  { name: "Electronics", val: "$24,831", pct: "29.5%", color: "bg-[#3884BE]" },
-                  { name: "Accessories", val: "$14,106", pct: "16.8%", color: "bg-[#A9B887]" },
-                  { name: "Office", val: "$3,622", pct: "4.3%", color: "bg-[#6F804F]" },
+                  { name: "Furniture", val: "₹35,31,920", pct: "49.4%", color: "bg-[#226192]" },
+                  { name: "Electronics", val: "₹21,10,635", pct: "29.5%", color: "bg-[#3884BE]" },
+                  { name: "Accessories", val: "₹11,99,010", pct: "16.8%", color: "bg-[#A9B887]" },
+                  { name: "Office", val: "₹3,08,112", pct: "4.3%", color: "bg-[#6F804F]" },
                 ].map((cat, idx) => (
                   <div key={idx} className="p-3.5 rounded-xl border border-[#DAD3C6] bg-[#FAF8F5] space-y-2">
                     <div className="flex items-center justify-between text-xs font-bold text-[#133857]">
@@ -589,13 +589,13 @@ export const HomePage: React.FC = () => {
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-[#5B5245]">
                   <li>
-                    <strong>Total Revenue:</strong> $45,000 (Across all transactions)
+                    <strong>Total Revenue:</strong> ₹45,00,000 (Across all transactions)
                   </li>
                   <li>
-                    <strong>Total Profit:</strong> $13,500 (Net margin ~30.0%)
+                    <strong>Total Profit:</strong> ₹13,50,000 (Net margin ~30.0%)
                   </li>
                   <li>
-                    <strong>Units Sold:</strong> 25 units at an average price of $1,800
+                    <strong>Units Sold:</strong> 25 units at an average price of ₹1,80,000
                   </li>
                 </ul>
               </div>

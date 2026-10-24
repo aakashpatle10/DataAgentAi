@@ -186,10 +186,10 @@ export const FeaturesPage: React.FC = () => {
             </div>
             <div className="space-y-3">
               {[
-                { name: "Furniture", val: "$41,552", pct: "49.4%", color: "bg-[#226192]" },
-                { name: "Electronics", val: "$24,831", pct: "29.5%", color: "bg-[#3884BE]" },
-                { name: "Accessories", val: "$14,106", pct: "16.8%", color: "bg-[#A9B887]" },
-                { name: "Office Supplies", val: "$3,622", pct: "4.3%", color: "bg-[#6F804F]" },
+                { name: "Furniture", val: "₹35,31,920", pct: "49.4%", color: "bg-[#226192]" },
+                { name: "Electronics", val: "₹21,10,635", pct: "29.5%", color: "bg-[#3884BE]" },
+                { name: "Accessories", val: "₹11,99,010", pct: "16.8%", color: "bg-[#A9B887]" },
+                { name: "Office Supplies", val: "₹3,08,112", pct: "4.3%", color: "bg-[#6F804F]" },
               ].map((c, i) => (
                 <div key={i} className="space-y-1">
                   <div className="flex justify-between text-xs text-[#133857] font-semibold">
@@ -222,8 +222,8 @@ export const FeaturesPage: React.FC = () => {
                 Sabse jyada revenue <strong>MacBook Pro</strong> ne generate kiya hai!
               </p>
               <div className="font-mono text-[11px] bg-black/20 p-2 rounded text-white space-y-0.5">
-                <div>• Total Revenue: $45,000</div>
-                <div>• Total Profit: $13,500</div>
+                <div>• Total Revenue: ₹38,25,000</div>
+                <div>• Total Profit: ₹11,47,500</div>
                 <div>• Units Sold: 25</div>
               </div>
               <p className="text-[11px]">

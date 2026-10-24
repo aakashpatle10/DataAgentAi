@@ -7,7 +7,9 @@
 .env.local
 .env.*.local
 *.env
-.env.example
+!.env.example
+!frontend/.env.example
+!backend/.env.example
 frontend/.env
 frontend/.env.local
 backend/.env
@@ -76,6 +78,7 @@ htmlcov/
 # Local Storage, Uploads & Reports Cache
 storage/
 backend/storage/
+!backend/app/storage/
 *.log
 
 # IDE & Editor Files

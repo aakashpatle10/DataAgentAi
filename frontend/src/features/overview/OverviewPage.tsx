@@ -9,7 +9,7 @@ import {
   MessageSquare,
   TrendingUp,
   Database,
-  DollarSign,
+  IndianRupee,
   Package,
   Layers,
   ShieldCheck,
@@ -290,10 +290,10 @@ export const OverviewPage: React.FC = () => {
     total_records: activeDataset?.row_count || 152,
     unique_records: (activeDataset?.row_count || 152) - 4,
     records_change: "+12%",
-    total_revenue_formatted: "$84,113",
+    total_revenue_formatted: "₹71,49,677",
     revenue_change: "+18%",
     revenue_subtext: "Across all regions",
-    total_profit_formatted: "$24,957",
+    total_profit_formatted: "₹21,21,426",
     profit_change: "+16%",
     margin_pct: "29.7% profit margin",
     total_products: 11,
@@ -588,7 +588,7 @@ export const OverviewPage: React.FC = () => {
         <div className="dash-card bg-[#FAF8F5] border border-[#DAD3C6] rounded-2xl p-4 sm:p-5 relative overflow-hidden shadow-xs">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#A9B887]/20 text-[#6F804F] flex items-center justify-center">
-              <DollarSign className="w-4 h-4" />
+              <IndianRupee className="w-4 h-4" />
             </div>
             <span className="text-xs font-semibold text-[#5B5245]">Total Revenue</span>
           </div>
@@ -993,13 +993,13 @@ export const OverviewPage: React.FC = () => {
                         {row.Units_Sold ?? row.units_sold ?? row.Quantity ?? 1}
                       </td>
                       <td className="px-3 py-2 font-mono text-[#5B5245]">
-                        ${row.Unit_Price ?? row.unit_price ?? 50}
+                        ₹{row.Unit_Price ?? row.unit_price ?? 50}
                       </td>
                       <td className="px-3 py-2 font-mono font-semibold text-[#226192]">
-                        ${row.Revenue ?? row.revenue ?? 150}
+                        ₹{row.Revenue ?? row.revenue ?? 150}
                       </td>
                       <td className="px-3 py-2 font-mono text-[#6F804F] font-semibold">
-                        ${row.Profit ?? row.profit ?? 45}
+                        ₹{row.Profit ?? row.profit ?? 45}
                       </td>
                     </tr>
                   ))}

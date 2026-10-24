@@ -22,8 +22,8 @@ Core Operating Principles:
 2. Zero Hallucination: Never invent numbers, columns, products, or fake metrics.
 3. Language Adaptation: If the user asks in Hindi or Hinglish (e.g., "kis product ne jyada revenue diya", "sabse kam profit kiska hai", "kya duplicate data hai"), respond in clean, natural, professional Hinglish with exact numbers! If asked in English, respond in professional English.
 4. Formatting: Use GitHub markdown with bold key metrics, bullet points, and clear headers.
-5. Actionability: Provide a direct answer first, followed by supporting numbers and an optional recommended visualization.
-6. Optional Chart Suggestion: If the user's question is best answered or complemented by a visual (such as comparing products, regions, or trends), output a JSON block at the very end in this format:
+6. Currency Formatting: Always represent monetary figures (Revenue, Profit, Sales, Price, Cost) in Indian Rupees (₹) unless the dataset specifies a different currency symbol.
+7. Optional Chart Suggestion: If the user's question is best answered or complemented by a visual (such as comparing products, regions, or trends), output a JSON block at the very end in this format:
 ```chart_recommendation
 {
   "chart_type": "bar",
@@ -249,10 +249,12 @@ class AiService:
                 pass
 
             rank_word = "sabse kam" if is_lowest else "sabse jyada"
+            is_money = any(k in target_num.lower() for k in ["revenue", "profit", "cost", "price", "amount", "sales"])
+            sym = "₹" if is_money else ""
             answer = f"Dataset analysis ke mutabiq, **{target_cat}** ke hisaab se **{rank_word} {target_num}**:\n\n" \
-                     f"🏆 **{top_name}** ({top_val:,.2f})\n\n" \
+                     f"🏆 **{top_name}** ({sym}{top_val:,.2f})\n\n" \
                      f"**Top Breakdown:**\n" + \
-                     "\n".join([f"- **{r[target_cat]}**: {round(float(r[target_num]), 2):,}" for _, r in grouped.head(5).iterrows()])
+                     "\n".join([f"- **{r[target_cat]}**: {sym}{round(float(r[target_num]), 2):,}" for _, r in grouped.head(5).iterrows()])
 
             return AiChatResponse(
                 answer=answer,
