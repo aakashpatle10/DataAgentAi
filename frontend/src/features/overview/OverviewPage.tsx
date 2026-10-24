@@ -52,7 +52,7 @@ interface ChatMessage {
 export const OverviewPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { activeDataset, activeDatasetId, setActiveDatasetId } = useActiveDataset();
+  const { activeDataset, activeDatasetId, setActiveDatasetId, setActiveDataset } = useActiveDataset();
 
   // Hidden file input for "Upload Dataset" button
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -109,8 +109,9 @@ export const OverviewPage: React.FC = () => {
   const demoMutation = useMutation({
     mutationFn: datasetsApi.loadDemo,
     onSuccess: (data) => {
+      setActiveDataset(data.metadata);
       queryClient.invalidateQueries({ queryKey: queryKeys.datasets });
-      setActiveDatasetId(data.metadata.id);
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary", data.metadata.id] });
       showToast("Demo Retail Sales dataset loaded successfully!");
     },
     onError: () => {
@@ -122,8 +123,9 @@ export const OverviewPage: React.FC = () => {
   const uploadMutation = useMutation({
     mutationFn: (file: File) => datasetsApi.upload(file),
     onSuccess: (data) => {
+      setActiveDataset(data.metadata);
       queryClient.invalidateQueries({ queryKey: queryKeys.datasets });
-      setActiveDatasetId(data.metadata.id);
+      queryClient.invalidateQueries({ queryKey: ["dashboard-summary", data.metadata.id] });
       showToast("Dataset uploaded and processed successfully!");
     },
     onError: () => {

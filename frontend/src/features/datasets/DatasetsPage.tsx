@@ -24,7 +24,7 @@ import { formatBytes } from "@/lib/utils";
 export const DatasetsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const { datasets, activeDatasetId, setActiveDatasetId, isLoadingDatasets } = useActiveDataset();
+  const { datasets, activeDatasetId, setActiveDatasetId, setActiveDataset, isLoadingDatasets } = useActiveDataset();
 
   // Delete mutation
   const deleteMutation = useMutation({
@@ -38,8 +38,8 @@ export const DatasetsPage: React.FC = () => {
   const demoMutation = useMutation({
     mutationFn: datasetsApi.loadDemo,
     onSuccess: (data) => {
+      setActiveDataset(data.metadata);
       queryClient.invalidateQueries({ queryKey: queryKeys.datasets });
-      setActiveDatasetId(data.metadata.id);
       setIsUploadModalOpen(false);
     },
   });
@@ -48,8 +48,8 @@ export const DatasetsPage: React.FC = () => {
   const uploadMutation = useMutation({
     mutationFn: datasetsApi.upload,
     onSuccess: (data) => {
+      setActiveDataset(data.metadata);
       queryClient.invalidateQueries({ queryKey: queryKeys.datasets });
-      setActiveDatasetId(data.metadata.id);
       setIsUploadModalOpen(false);
     },
   });

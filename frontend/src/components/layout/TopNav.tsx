@@ -47,7 +47,7 @@ export const TopNav: React.FC = () => {
 
   const commandInputRef = useRef<HTMLInputElement>(null);
 
-  const { activeDataset, activeDatasetId, datasets, setActiveDatasetId } = useActiveDataset();
+  const { activeDataset, activeDatasetId, datasets, setActiveDatasetId, setActiveDataset } = useActiveDataset();
 
   // Health Query (Backend & MongoDB status)
   const { data: health } = useQuery({
@@ -60,8 +60,8 @@ export const TopNav: React.FC = () => {
   const uploadMutation = useMutation({
     mutationFn: datasetsApi.upload,
     onSuccess: (data) => {
+      setActiveDataset(data.metadata);
       queryClient.invalidateQueries({ queryKey: queryKeys.datasets });
-      setActiveDatasetId(data.metadata.id);
       setIsUploadModalOpen(false);
     },
   });
@@ -70,8 +70,8 @@ export const TopNav: React.FC = () => {
   const demoMutation = useMutation({
     mutationFn: datasetsApi.loadDemo,
     onSuccess: (data) => {
+      setActiveDataset(data.metadata);
       queryClient.invalidateQueries({ queryKey: queryKeys.datasets });
-      setActiveDatasetId(data.metadata.id);
       setIsUploadModalOpen(false);
     },
   });
