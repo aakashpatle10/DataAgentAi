@@ -23,6 +23,9 @@ htmlcov/
 # Storage
 storage/
 !app/storage/
+!app/storage/**
+app/storage/**/__pycache__/
+app/storage/**/*.py[cod]
 
 # IDE / OS
 .vscode/

@@ -8,10 +8,12 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from app.config import settings
 
 if __name__ == "__main__":
-    print(f"Starting DataAgent AI Backend on http://{settings.APP_HOST}:{settings.APP_PORT}")
+    bind_host = "0.0.0.0" if (os.environ.get("RENDER") or os.environ.get("PORT") or (settings.APP_HOST in ("127.0.0.1", "localhost") and os.environ.get("PORT"))) else settings.APP_HOST
+    print(f"Starting DataAgent AI Backend on http://{bind_host}:{settings.APP_PORT}")
     uvicorn.run(
         "app.main:app",
-        host=settings.APP_HOST,
+        host=bind_host,
         port=settings.APP_PORT,
         reload=(settings.APP_ENV == "development")
     )
+

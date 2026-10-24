@@ -28,9 +28,13 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-# Bind dynamic PORT in cloud environments (Render, Railway, Heroku, etc.)
-if "PORT" in os.environ:
+# Bind dynamic PORT and host in cloud environments (Render, Railway, Heroku, etc.)
+if "PORT" in os.environ or "RENDER" in os.environ:
     try:
-        settings.APP_PORT = int(os.environ["PORT"])
+        if "PORT" in os.environ:
+            settings.APP_PORT = int(os.environ["PORT"])
     except Exception:
         pass
+    # Cloud environments require listening on 0.0.0.0 for external port routing and health checks
+    settings.APP_HOST = "0.0.0.0"
+

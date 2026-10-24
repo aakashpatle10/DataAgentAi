@@ -8,7 +8,47 @@ from fastapi import UploadFile, HTTPException
 
 from app.config import settings
 from app.repositories.dataset_repository import repository
-from app.storage.demo_data import generate_demo_dataset
+try:
+    from app.storage.demo_data import generate_demo_dataset
+except (ImportError, ModuleNotFoundError):
+    try:
+        from storage.demo_data import generate_demo_dataset
+    except Exception:
+        from datetime import datetime, timedelta
+        def generate_demo_dataset() -> pd.DataFrame:
+            np.random.seed(42)
+            categories = {
+                "Technology": ["Laptop Pro 15", "Wireless Mouse", "Mechanical Keyboard", "4K Monitor", "USB-C Hub"],
+                "Office Supplies": ["Ergonomic Chair", "Standing Desk Mat", "Gel Pen Set", "Notebook Pack", "Paper Shredder"],
+                "Electronics": ["Noise-Cancel Headphones", "Bluetooth Speaker", "Smart Watch", "Webcam HD", "Power Bank 20k"]
+            }
+            regions = ["North America", "Europe", "Asia-Pacific", "Latin America"]
+            segments = ["Consumer", "Corporate", "Small Business"]
+            records = []
+            base_date = datetime(2024, 1, 15)
+            for i in range(150):
+                cat = np.random.choice(list(categories.keys()))
+                prod = np.random.choice(categories[cat])
+                reg = np.random.choice(regions)
+                seg = np.random.choice(segments)
+                unit_price = round(float(np.random.uniform(1000, 50000)), 2)
+                units_sold = int(np.random.randint(1, 15))
+                revenue = round(unit_price * units_sold, 2)
+                profit = round(revenue * 0.25, 2)
+                records.append({
+                    "Order_ID": f"ORD-{1001 + i}",
+                    "Order_Date": (base_date + timedelta(days=int(np.random.randint(0, 240)))).strftime("%Y-%m-%d"),
+                    "Product": prod,
+                    "Category": cat,
+                    "Region": reg,
+                    "Customer_Segment": seg,
+                    "Units_Sold": units_sold,
+                    "Unit_Price": unit_price,
+                    "Revenue": revenue,
+                    "Cost": round(revenue - profit, 2),
+                    "Profit": profit,
+                })
+            return pd.DataFrame(records)
 from app.schemas.dataset import DatasetMeta, ColumnSchema, DatasetPreviewResponse
 from app.utils.serializer import clean_value, clean_record_dict
 from app.utils.validators import validate_dataset_id, validate_extension, validate_filename
@@ -35,7 +75,7 @@ class DatasetService:
         if len(non_null) > 0 and len(non_null) <= 500:
             try:
                 # Try parsing first few values
-                pd.to_datetime(non_null.iloc[:10], errors="raise")
+                pd.to_datetime(non_null.iloc[:10], errors="raise", format="mixed")
                 return "datetime"
             except Exception:
                 pass

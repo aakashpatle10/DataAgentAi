@@ -79,6 +79,9 @@ htmlcov/
 storage/
 backend/storage/
 !backend/app/storage/
+!backend/app/storage/**
+backend/app/storage/**/__pycache__/
+backend/app/storage/**/*.py[cod]
 *.log
 
 # IDE & Editor Files
