@@ -14,23 +14,56 @@ from app.repositories.dataset_repository import repository
 from app.utils.serializer import clean_value, clean_record_dict
 
 SYSTEM_PROMPT = """
-You are DataAgent AI, an expert, evidence-based AI Data Analyst Agent integrated into an enterprise analytics platform.
-Your purpose is to convert raw tabular data into verified, accurate, understandable insights.
+You are DataAgent AI, an intelligent, conversational, evidence-based AI Data Analyst and Senior Business Growth Strategist integrated into an enterprise analytics platform.
 
-Core Operating Principles:
-1. Grounding: You ONLY answer using verified calculations and schema from the provided dataset context.
-2. Zero Hallucination: Never invent numbers, columns, products, or fake metrics.
-3. Language Adaptation: If the user asks in Hindi or Hinglish (e.g., "kis product ne jyada revenue diya", "sabse kam profit kiska hai", "kya duplicate data hai"), respond in clean, natural, professional Hinglish with exact numbers! If asked in English, respond in professional English.
-4. Formatting: Use GitHub markdown with bold key metrics, bullet points, and clear headers.
-6. Currency Formatting: Always represent monetary figures (Revenue, Profit, Sales, Price, Cost) in Indian Rupees (₹) unless the dataset specifies a different currency symbol.
-7. Optional Chart Suggestion: If the user's question is best answered or complemented by a visual (such as comparing products, regions, or trends), output a JSON block at the very end in this format:
+Your mission:
+1. Converse naturally and intelligently with the user.
+2. Provide simple, friendly replies for casual chat (never force unwanted data analysis into simple greetings).
+3. Deliver deep, data-backed business growth plans, strategic analysis, and proven business techniques when asked.
+4. Answer data questions by explaining thoroughly in conversational text first, and recommending an interactive chart at the very end only when a visual genuinely enhances understanding.
+
+---
+### CORE OPERATING PRINCIPLES:
+
+1. SIMPLE & NATURAL CONVERSATION FOR CASUAL CHAT:
+- If the user sends a greeting or casual chat (e.g., "hi", "hello", "hey", "namaste", "kaise ho", "kya haal hai", "thanks", "who are you", "kya kar sakte ho", "help"):
+  -> Give a simple, friendly, warm, and natural conversational response (1-3 sentences).
+  -> DO NOT force an unprompted metric dump, column listing, or heavy analysis into a simple greeting!
+  -> Introduce yourself and invite them to ask about their data or request business growth strategies.
+
+2. DETAILED BUSINESS GROWTH & STRATEGY PLANS (WHEN REQUESTED):
+- When the user asks for business advice, a growth plan, sales improvement, or strategic guidance (e.g., "business grow karne ke liye plan batao", "sales kaise badhaye", "mere data ke according strategy batao", "give me growth techniques"):
+  -> Act as a top-tier Chief Strategy & Growth Officer.
+  -> Formulate a comprehensive, structured, practical Action Plan using their ACTUAL data numbers.
+  -> Structure the plan logically:
+     • 📊 **Current Health Check**: Overview of revenue, profit, margins, and key highlights.
+     • 🚀 **1. Hero Products Focus (80/20 Pareto Principle)**: Identify top revenue and profit drivers. Recommend prioritizing their inventory, marketing budget, and premium visibility.
+     • 📦 **2. Cross-Selling & Product Bundling (AOV Booster)**: Pair high-volume, lower-ticket accessories with flagship items to increase Average Order Value (AOV).
+     • 🌍 **3. Regional & Channel Expansion**: Target underperforming regions with localized promotions; reward top regions with loyalty perks.
+     • 🏷️ **4. Margin & Discount Optimization**: Audit high-discount orders; reduce discounts on inelastic, high-demand items to plug profit leakage.
+     • 🎯 **5. Immediate 30-Day Action Roadmap**: 3-4 concrete priorities to execute immediately.
+  -> Ground every recommendation in realistic business techniques, marketing psychology, and actual numbers from the dataset.
+
+3. EXPLAIN THOROUGHLY IN CHAT FIRST, GRAPH AT THE VERY END:
+- Whenever answering a data question, ALWAYS explain everything clearly in text first (the direct answer, the business reason, key supporting numbers, and comparisons).
+- If and only if a visual representation is genuinely helpful (e.g. comparing product sales, monthly trends, regional breakdown), recommend the chart AT THE VERY END using the JSON format below.
+- NEVER recommend a chart for greetings, general advice, or purely conceptual chat unless the user explicitly asked for a chart/graph.
+
+4. LANGUAGE ADAPTATION:
+- If the user writes in Hindi or Hinglish (e.g., "kis product ne jyada revenue diya", "plan batao", "sales kaise badhaye"), respond in natural, professional, clear Hinglish.
+- If the user writes in English, reply in professional, polished English.
+
+5. CURRENCY:
+- Always format monetary metrics with the Indian Rupee symbol '₹' (e.g., ₹27,18,742 or ₹15,85,080).
+
+6. CHART RECOMMENDATION FORMAT (ONLY AT THE VERY END OF MESSAGE):
 ```chart_recommendation
 {
   "chart_type": "bar",
   "x_column": "ColumnName",
   "y_column": "ColumnName",
   "aggregation": "sum",
-  "title": "Chart Title"
+  "title": "Clear Descriptive Title"
 }
 ```
 Supported chart_types: "bar", "line", "scatter", "pie", "histogram", "box".
@@ -129,13 +162,108 @@ class AiService:
     def _deterministic_analysis(self, dataset_id: str, df: pd.DataFrame, message: str) -> AiChatResponse:
         """
         Robust deterministic fallback powered by Pandas and NumPy.
-        Understands Hindi, Hinglish, and English analytical queries.
+        Understands Hindi, Hinglish, and English analytical and conversational queries.
         """
         msg = message.lower().strip()
         num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
         cat_cols = [c for c in df.columns if c not in num_cols]
 
-        # 1. Missing values inquiry
+        # 0. Casual greetings & conversational checks (No forced analysis!)
+        greeting_words = ["hi", "hello", "hey", "namaste", "kaise ho", "kya haal", "kya haal hai", "who are you", "kya kar sakte ho", "help", "good morning", "good evening", "shukriya", "thanks", "thank you"]
+        words_only = re.sub(r"[^\w\s]", "", msg).strip().split()
+        is_greeting = (
+            any(g in msg for g in ["namaste", "kaise ho", "kya haal", "who are you", "kya kar sakte ho"]) or
+            (len(words_only) <= 3 and any(w in greeting_words for w in words_only))
+        )
+        if is_greeting:
+            answer = (
+                "Namaste! 👋 Main aapka **DataAgent AI** analyst hoon.\n\n"
+                "Main aapke uploaded data ko samajhne, business insights nikalne, aur data ke hisaab se **growth strategies plan** karne me aapki madad karta hoon.\n\n"
+                "Aap mujhse:\n"
+                "- Koi bhi sawal pooch sakte hain (jaise: *'Kis product ne sabse zyada revenue diya?'*)\n"
+                "- Apne business ko grow karne ke liye strategy mang sakte hain (jaise: *'Mere business ko grow karne ke liye plan batao'*)\n"
+                "- Specific trends, data quality, ya chart comparisons samajh sakte hain!"
+            )
+            return AiChatResponse(
+                answer=answer,
+                intent_recognized="conversational_greeting",
+                is_ai_live=False,
+                suggested_followups=[
+                    "Mere business ko grow karne ke liye plan batao",
+                    "Kis product ne sabse jyada revenue diya?",
+                    "Show monthly sales trend"
+                ]
+            )
+
+        # 1. Business Growth & Strategic Planning (Detailed Blueprint)
+        strategy_words = ["grow", "growth", "business", "plan", "strategy", "badhaye", "sales kaise", "badhana", "tarika", "kaise badha", "technique", "recommendation", "suggestion", "ideas", "advice", "profit kaise", "tips"]
+        if any(w in msg for w in strategy_words):
+            rev_col = next((c for c in num_cols if any(k in c.lower() for k in ["revenue", "sales_amount", "amount", "sales"])), None)
+            prof_col = next((c for c in num_cols if any(k in c.lower() for k in ["profit", "margin", "earnings"])), None)
+            prod_col = next((c for c in cat_cols if any(k in c.lower() for k in ["product", "item", "sku"])), None)
+            cat_col = next((c for c in cat_cols if any(k in c.lower() for k in ["category", "dept", "segment"])), None)
+            reg_col = next((c for c in cat_cols if any(k in c.lower() for k in ["region", "zone", "state", "city"])), None)
+
+            total_rev = float(df[rev_col].sum()) if rev_col else 0.0
+            total_prof = float(df[prof_col].sum()) if prof_col else 0.0
+            margin_pct = round((total_prof / total_rev * 100), 1) if total_rev > 0 else 0.0
+
+            top_prod_name = "Top Item"
+            top_prod_rev = 0.0
+            if prod_col and rev_col:
+                p_grp = df.groupby(prod_col)[rev_col].sum().sort_values(ascending=False)
+                if not p_grp.empty:
+                    top_prod_name = str(p_grp.index[0])
+                    top_prod_rev = float(p_grp.iloc[0])
+
+            top_cat_name = "Top Category"
+            if cat_col and rev_col:
+                c_grp = df.groupby(cat_col)[rev_col].sum().sort_values(ascending=False)
+                if not c_grp.empty:
+                    top_cat_name = str(c_grp.index[0])
+
+            weak_reg_name = "Specific Territories"
+            if reg_col and rev_col:
+                r_grp = df.groupby(reg_col)[rev_col].sum().sort_values(ascending=True)
+                if not r_grp.empty:
+                    weak_reg_name = str(r_grp.index[0])
+
+            answer = (
+                f"### 📈 Data-Backed Business Growth Blueprint\n\n"
+                f"Aapke active dataset ke verified numbers ke mutabiq, yahan aapke business ke liye actionable **Growth Strategy & Techniques** hain:\n\n"
+                f"#### 📊 Business Health Overview:\n"
+                f"- **Total Revenue**: ₹{total_rev:,.2f}\n"
+                f"- **Total Profit**: ₹{total_prof:,.2f} (Overall Net Margin: **{margin_pct}%**)\n"
+                f"- **Top Revenue Driver**: **{top_prod_name}** (₹{top_prod_rev:,.2f})\n"
+                f"- **Leading Category**: **{top_cat_name}**\n\n"
+                f"---\n\n"
+                f"#### 🚀 1. Hero Products Focus (80/20 Pareto Rule)\n"
+                f"- Aapka **{top_prod_name}** total revenue me sabse bada yogdan de raha hai.\n"
+                f"- **Strategy**: Inventory aur marketing budget ka 60% top 2-3 products par allocate karein. In items ko apni website ya store par spotlight me rakhein taaki cash flow aur margins steady rahein.\n\n"
+                f"#### 📦 2. Product Bundling & Cross-Selling (AOV Booster)\n"
+                f"- High-ticket items ({top_prod_name}) ke sath fast-moving accessories ka **Bundle Deal** banayein.\n"
+                f"- **Technique**: *'Bundle & Save 10%'* offer dein. Isse customer ke purchase decision fast honge aur Average Order Value (AOV) 20-30% boost hogi.\n\n"
+                f"#### 🌍 3. Regional Scaling & Localized Marketing\n"
+                f"- **{weak_reg_name}** jaise lagging regions me targeted online promotions aur free delivery offers run karein, jabki top performing regions me repeat customer loyalty programs lagayein.\n\n"
+                f"#### 🏷️ 4. Discount & Margin Leakage Control\n"
+                f"- Jin products ki demand already strong hai, unpar aggressive discounts cut karein. Sirf 3-5% discount kam karne se aapka direct net profit margin 8-12% tak jump karega.\n\n"
+                f"#### 🎯 5. Immediate 30-Day Action Roadmap:\n"
+                f"1. **Week 1-2**: {top_prod_name} ka stock buffer badhayein aur bundle packages design karein.\n"
+                f"2. **Week 3**: {weak_reg_name} region ke liye targeted digital campaigns launch karein.\n"
+                f"3. **Week 4**: High margin category ({top_cat_name}) me discount policy audit karein."
+            )
+            return AiChatResponse(
+                answer=answer,
+                intent_recognized="business_growth_plan",
+                is_ai_live=False,
+                suggested_followups=[
+                    "Kis product ne sabse jyada revenue diya?",
+                    "Show monthly sales trend",
+                    "Category-wise breakdown chart dikhao"
+                ]
+            )
+
+        # 2. Missing values inquiry
         if any(w in msg for w in ["missing", "null", "empty", "khali", "chhota"]):
             missing_dict = df.isna().sum()
             missing_cols = {k: int(v) for k, v in missing_dict.items() if v > 0}
@@ -152,7 +280,7 @@ class AiService:
                 suggested_followups=["Are there any duplicate rows?", "Show correlation matrix", "Which category has the highest revenue?"]
             )
 
-        # 2. Duplicate rows inquiry
+        # 3. Duplicate rows inquiry
         if any(w in msg for w in ["duplicate", "nakli", "same row"]):
             dup_count = int(df.duplicated().sum())
             if dup_count > 0:
@@ -167,7 +295,7 @@ class AiService:
                 suggested_followups=["Which column has the highest variance?", "Show me top revenue products"]
             )
 
-        # 3. Correlation inquiry
+        # 4. Correlation inquiry
         if any(w in msg for w in ["relationship", "correlat", "sambandh"]):
             if len(num_cols) >= 2:
                 c1, c2 = num_cols[0], num_cols[1]
@@ -206,7 +334,7 @@ class AiService:
                     suggested_followups=["Which product generated the highest revenue?", "Show outlier analysis"]
                 )
 
-        # 4. Grouped queries (e.g. "kis product ne jyada revenue diya", "top product", "highest profit")
+        # 5. Grouped queries (e.g. "kis product ne jyada revenue diya", "top product", "highest profit")
         target_num = None
         for cand in ["revenue", "profit", "sales", "sales_amount", "amount", "units_sold"]:
             match = next((c for c in num_cols if cand in c.lower()), None)
@@ -261,25 +389,25 @@ class AiService:
                 intent_recognized="grouped_aggregation",
                 is_ai_live=False,
                 suggested_chart=chart,
-                computed_data=grouped.head(10).to_dict(orient="records"),
+                computed_data={"breakdown": grouped.head(10).to_dict(orient="records")},
                 suggested_followups=["Which region has lowest profit?", "Show outlier analysis", "Generate PDF report"]
             )
 
-        # 5. Default General Overview
+        # 6. Default General Overview
         row_count = len(df)
         col_count = len(df.columns)
         answer = f"Is dataset me total **{row_count:,} records** aur **{col_count} columns** hain.\n\n" \
                  f"- **Numeric metrics**: {', '.join(num_cols[:5]) if num_cols else 'None'}\n" \
                  f"- **Categorical dimensions**: {', '.join(cat_cols[:5]) if cat_cols else 'None'}\n\n" \
-                 f"Aap data ke baare me koi bhi question pooch sakte hain, jaise:\n" \
-                 f"- *Kis product ne sabse jyada revenue diya?*\n" \
-                 f"- *Which category generated highest profit?*\n" \
-                 f"- *Are there any missing values or duplicates?*"
+                 f"Aap mujhse:\n" \
+                 f"- *'Kis product ne sabse jyada revenue diya?'*\n" \
+                 f"- *'Mere business ko grow karne ke liye plan batao'*\n" \
+                 f"- *'Are there any missing values or duplicates?'* pooch sakte hain."
         return AiChatResponse(
             answer=answer,
             intent_recognized="dataset_overview",
             is_ai_live=False,
-            suggested_followups=["Kis product ne jyada revenue diya?", "Show correlation heatmap", "Are there any outliers?"]
+            suggested_followups=["Mere business ko grow karne ke liye plan batao", "Kis product ne jyada revenue diya?", "Show correlation heatmap"]
         )
 
     async def chat(self, dataset_id: str, message: str) -> AiChatResponse:
@@ -293,11 +421,21 @@ class AiService:
             # Build verified analytical context
             context_str = self._build_dataset_context(df, dataset_name)
             
+            # Fetch recent conversation history for natural conversational context
+            history = repository.get_chat_history(dataset_id)[-6:]
+            history_str = ""
+            if history:
+                history_str = "### RECENT CONVERSATION HISTORY:\n" + "\n".join([
+                    f"- {h.get('role', 'user').title()}: {h.get('content', '')[:300]}"
+                    for h in history
+                ]) + "\n\n"
+
             prompt_content = (
                 f"{SYSTEM_PROMPT}\n\n"
                 f"### VERIFIED DATASET CALCULATIONS & CONTEXT:\n{context_str}\n\n"
-                f"### USER INQUIRY:\n{message}\n\n"
-                f"Answer the user directly and accurately using only the verified metrics above."
+                f"{history_str}"
+                f"### CURRENT USER INQUIRY:\n{message}\n\n"
+                f"Answer the user following the core principles: simple natural reply for greetings, detailed structured plan with techniques for business growth inquiries, explain in chat first, and only include a chart recommendation at the end if a visual is genuinely helpful."
             )
 
             payload = {
@@ -309,14 +447,13 @@ class AiService:
                     }
                 ],
                 "generationConfig": {
-                    "temperature": 0.2,
-                    "maxOutputTokens": 1000
+                    "temperature": 0.25,
+                    "maxOutputTokens": 2048
                 }
             }
 
             # Try working models: gemini-3.5-flash, gemini-3.8-flash, settings.AI_MODEL
             models_to_try = ["gemini-3.5-flash", "gemini-3.8-flash", settings.AI_MODEL, "gemini-flash-latest"]
-            # Deduplicate while preserving order
             unique_models = []
             for m in models_to_try:
                 if m and m not in unique_models:
@@ -326,7 +463,7 @@ class AiService:
             for model_name in unique_models:
                 url = f"{settings.AI_BASE_URL}/models/{model_name}:generateContent?key={api_key}"
                 try:
-                    async with httpx.AsyncClient(timeout=18.0) as client:
+                    async with httpx.AsyncClient(timeout=22.0) as client:
                         res = await client.post(url, json=payload)
                         if res.status_code == 200:
                             data = res.json()
@@ -335,7 +472,7 @@ class AiService:
                                 parts = candidates[0]["content"].get("parts", [])
                                 full_text = "".join([p.get("text", "") for p in parts]).strip()
                                 
-                                # Extract any chart recommendation JSON block
+                                # Extract any chart recommendation JSON block from end of response
                                 chart = None
                                 chart_match = re.search(r"```chart_recommendation\s*([\s\S]*?)\s*```", full_text)
                                 if chart_match:
@@ -354,22 +491,20 @@ class AiService:
                                     except Exception:
                                         pass
 
-                                # If no chart block, but question asks for top products/categories and revenue
-                                if not chart:
+                                # Only generate a fallback chart if the user explicitly requested a chart/graph
+                                if not chart and any(k in message.lower() for k in ["chart", "graph", "plot", "visualize", "dikhao graph", "graph banao", "chart dikhao"]):
                                     num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
                                     cat_cols = [c for c in df.columns if c not in num_cols]
-                                    q_lower = message.lower()
-                                    if any(k in q_lower for k in ["product", "category", "region", "revenue", "profit", "sales", "jyada", "highest"]):
-                                        target_num = next((c for c in num_cols if any(k in c.lower() for k in ["revenue", "sales", "profit", "amount"])), num_cols[0] if num_cols else None)
-                                        target_cat = next((c for c in cat_cols if any(k in c.lower() for k in ["product", "category", "region"])), cat_cols[0] if cat_cols else None)
-                                        if target_num and target_cat:
-                                            try:
-                                                chart = chart_service.generate_chart(
-                                                    dataset_id,
-                                                    ChartConfigRequest(chart_type="bar", x_column=target_cat, y_column=target_num, aggregation="sum", title=f"Top {target_cat} by {target_num}")
-                                                )
-                                            except Exception:
-                                                pass
+                                    target_num = next((c for c in num_cols if any(k in c.lower() for k in ["revenue", "sales", "profit", "amount"])), num_cols[0] if num_cols else None)
+                                    target_cat = next((c for c in cat_cols if any(k in c.lower() for k in ["product", "category", "region"])), cat_cols[0] if cat_cols else None)
+                                    if target_num and target_cat:
+                                        try:
+                                            chart = chart_service.generate_chart(
+                                                dataset_id,
+                                                ChartConfigRequest(chart_type="bar", x_column=target_cat, y_column=target_num, aggregation="sum", title=f"Top {target_cat} by {target_num}")
+                                            )
+                                        except Exception:
+                                            pass
 
                                 result = AiChatResponse(
                                     answer=full_text,
@@ -377,9 +512,9 @@ class AiService:
                                     is_ai_live=True,
                                     suggested_chart=chart,
                                     suggested_followups=[
+                                        "Mere business ko grow karne ke liye plan batao",
                                         "Which category generated highest profit?",
-                                        "Show regional sales breakdown",
-                                        "Are there any outliers in this data?"
+                                        "Show regional sales breakdown"
                                     ]
                                 )
                                 repository.save_chat_message(dataset_id, {"role": "user", "content": message})

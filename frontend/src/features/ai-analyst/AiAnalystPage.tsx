@@ -105,11 +105,11 @@ export const AiAnalystPage: React.FC = () => {
   };
 
   const suggestedPrompts = [
+    "Mere business ko grow karne ke liye plan batao",
+    "Which product generated the highest revenue?",
+    "Sales aur profit badhane ki strategies kya hain?",
     "Which category generated the highest profit?",
-    "Show the relationship between revenue and profit",
-    "Which columns contain missing values?",
-    "Are there any duplicate rows in this dataset?",
-    "Summarize the overall dataset for a nontechnical stakeholder",
+    "Are there any duplicate rows or missing values?",
   ];
 
   return (

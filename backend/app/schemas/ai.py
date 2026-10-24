@@ -17,6 +17,6 @@ class AiChatResponse(BaseModel):
     answer: str
     intent_recognized: str
     is_ai_live: bool
-    computed_data: Optional[Dict[str, Any]] = None
+    computed_data: Optional[Any] = None
     suggested_chart: Optional[ChartResponse] = None
     suggested_followups: List[str] = Field(default_factory=list)

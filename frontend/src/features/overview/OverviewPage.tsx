@@ -278,11 +278,11 @@ export const OverviewPage: React.FC = () => {
 
   // Suggested questions shown under greeting
   const suggestedPrompts = [
+    "Mere business ko grow karne ke liye plan batao",
     "Which product has the highest revenue?",
+    "Sales aur profit badhane ki strategies kya hain?",
     "Show monthly sales trend",
     "Find missing values and duplicates",
-    "Compare sales across regions",
-    "Generate a summary report",
   ];
 
   // Helper values from summary or fallback defaults
